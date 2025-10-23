@@ -1,15 +1,17 @@
-# DevColor Database Project
+# DevColor Data Generation
 
-This project contains scripts for setting up MariaDB databases and generating synthetic data for educational institutions.
+This project contains scripts for setting up MariaDB databases and generating synthetic data for educational institutions using local or cloud-based LLMs.
 
 ## Prerequisites
 
-### 1. Install Ollama (Optional - for LLM-generated data)
+### 1. Choose Your LLM Provider (Ollama or AWS Bedrock)
 
-**Windows:**
-1. Go to https://ollama.ai and download the Windows installer
-2. Run the installer and follow setup instructions
-3. Alternative: `winget install Ollama.Ollama`
+#### Option 1: Ollama (Recommended for local development)
+**Installation:**
+- **Windows:**
+  1. Go to [ollama.ai](https://ollama.ai) and download the Windows installer
+  2. Run the installer and follow setup instructions
+  3. Alternative: `winget install Ollama.Ollama`
 
 **Start Ollama Service:**
 ```bash
@@ -25,6 +27,19 @@ ollama pull mistral
 - RAM: At least 8GB (16GB recommended)
 - Storage: 4-8GB for model files
 - CPU: Any modern CPU (more cores = faster generation)
+
+#### Option 2: AWS Bedrock (For production use)
+**Requirements:**
+- AWS account with Bedrock access
+- IAM user with `bedrock:InvokeModel` permissions
+- AWS CLI configured with valid credentials
+
+**Environment Variables:**
+```
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_key
+AWS_DEFAULT_REGION=your_region
+```
 
 ### 2. Python Environment Setup
 
