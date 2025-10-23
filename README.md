@@ -47,6 +47,13 @@ DB_PASSWORD=your_password
 DB_PORT=3306
 ```
 
+## Database Structure
+
+Each database in this project contains the following three tables:
+- `financial_aid`: Contains financial aid information for students
+- `course`: Contains course-related data
+- `cohort`: Contains cohort information for tracking student groups
+
 ## Database Setup
 
 ### 1. Create Databases and Tables
