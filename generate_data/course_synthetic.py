@@ -134,30 +134,19 @@ def get_db_connection(database_name: str = None):
         return None
 
 def create_course_table(connection):
-    """Create course table if it doesn't exist."""
+    """Add school column to existing course table if it doesn't exist."""
     cursor = connection.cursor()
     
-    # Updated table structure with school field
-    create_table_sql = """
-    CREATE TABLE IF NOT EXISTS course (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        course_code VARCHAR(20) NOT NULL,
-        course_title VARCHAR(255) NOT NULL,
-        credits INT DEFAULT 3,
-        department VARCHAR(100),
-        prerequisites TEXT,
-        description TEXT,
-        school VARCHAR(10) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    """
-    
     try:
-        cursor.execute(create_table_sql)
+        # Add school column if it doesn't exist
+        cursor.execute("ALTER TABLE course ADD COLUMN school VARCHAR(10)")
         connection.commit()
-        print("Course table created/verified")
+        print("Added school column to course table")
     except Error as e:
-        print(f"Error creating course table: {e}")
+        if "Duplicate column name" in str(e):
+            print("School column already exists in course table")
+        else:
+            print(f"Error adding school column: {e}")
     finally:
         cursor.close()
 
@@ -165,10 +154,10 @@ def insert_course_data(connection, course_data: List[Dict], school_acronym: str)
     """Insert course data into the database."""
     cursor = connection.cursor()
     
-    # Updated insert statement with school field
+    # Updated insert statement with school field - matching actual table columns
     insert_sql = """
-    INSERT INTO course (course_code, course_title, credits, department, prerequisites, description, school)
-    VALUES (%s, %s, %s, %s, %s, %s, %s)
+    INSERT INTO course (code, title, credits, description, school)
+    VALUES (%s, %s, %s, %s, %s)
     """
     
     try:
@@ -179,8 +168,6 @@ def insert_course_data(connection, course_data: List[Dict], school_acronym: str)
                 course.get('course_code', f"COURSE{random.randint(100, 999)}"),
                 course.get('course_title', course.get('title', 'Unknown Course')),
                 course.get('credits', random.randint(1, 4)),
-                course.get('department', 'General'),
-                course.get('prerequisites', ''),
                 course.get('description', ''),
                 school_acronym
             )
@@ -237,7 +224,7 @@ def main():
     """Main function to generate and distribute synthetic data."""
     
     # Load and clean seed data
-    seed_file_path = "../data/course_analysis_ready_file_template_Identified_01_27_25.xlsx"
+    seed_file_path = "data/course_analysis_ready_file_template_Identified_01_27_25.xlsx"
     
     if not os.path.exists(seed_file_path):
         print(f"Seed data file not found: {seed_file_path}")

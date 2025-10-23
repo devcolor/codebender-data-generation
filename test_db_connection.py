@@ -21,35 +21,8 @@ def list_databases(connection):
     cursor.close()
     return databases
 
-def list_tables(connection, database):
-    """List all tables in a specific database."""
-    cursor = connection.cursor()
-    try:
-        cursor.execute(f"USE `{database}`")
-        cursor.execute("SHOW TABLES")
-        tables = [table[0] for table in cursor.fetchall()]
-        return tables
-    except Error as e:
-        print(f"Error listing tables in {database}: {e}")
-        return []
-    finally:
-        cursor.close()
-
-def describe_table(connection, database, table):
-    """Show the structure of a specific table."""
-    cursor = connection.cursor(dictionary=True)
-    try:
-        cursor.execute(f"USE `{database}`")
-        cursor.execute(f"DESCRIBE `{table}`")
-        return cursor.fetchall()
-    except Error as e:
-        print(f"Error describing table {database}.{table}: {e}")
-        return []
-    finally:
-        cursor.close()
-
 def main():
-    """Main function to list all databases and their tables."""
+    """Main function to list all databases."""
     load_dotenv()
     connection = None
     
@@ -58,31 +31,15 @@ def main():
         connection = get_connection()
         
         if connection.is_connected():
-            print(f"\nConnected to: {connection.get_server_info()}")
+            print(f"\nConnected to MariaDB Server version: {connection.server_info}")
             
             # List all databases
-            print("\n=== Databases ===")
+            print("\nAvailable Databases:")
+            print("-" * 30)
             databases = list_databases(connection)
             
-            for db in databases:
-                print(f"\nDatabase: {db}")
-                print("-" * (len(db) + 10))
-                
-                # List all tables in the database
-                tables = list_tables(connection, db)
-                if not tables:
-                    print("  No tables found")
-                    continue
-                    
-                for table in tables:
-                    print(f"  Table: {table}")
-                    
-                    # Show table structure
-                    columns = describe_table(connection, db, table)
-                    if columns:
-                        print("    Columns:")
-                        for col in columns:
-                            print(f"      - {col['Field']} ({col['Type']}) {'NULL' if col['Null'] == 'YES' else 'NOT NULL'} {col.get('Key', '')} {col.get('Default', '')} {col.get('Extra', '')}".strip())
+            for i, db in enumerate(databases, 1):
+                print(f"{i:2d}. {db}")
     
     except Error as e:
         print(f"Error: {e}")

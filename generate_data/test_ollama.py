@@ -9,7 +9,7 @@ def test_ollama_connection():
         
         if response.status_code == 200:
             models = response.json()
-            print("✅ Ollama is running!")
+            print("Ollama is running!")
             print("Available models:")
             for model in models.get('models', []):
                 print(f"  - {model.get('name', 'Unknown')}")
@@ -17,22 +17,22 @@ def test_ollama_connection():
             # Test if mistral is available
             model_names = [model.get('name', '') for model in models.get('models', [])]
             if any('mistral' in name.lower() for name in model_names):
-                print("✅ Mistral model is available!")
+                print("Mistral model is available!")
             else:
-                print("⚠️  Mistral model not found. You may need to pull it:")
+                print("Mistral model not found. You may need to pull it:")
                 print("   Run: ollama pull mistral")
             
             return True
         else:
-            print(f"❌ Ollama responded with status code: {response.status_code}")
+            print(f"Ollama responded with status code: {response.status_code}")
             return False
             
     except requests.exceptions.ConnectionError:
-        print("❌ Cannot connect to Ollama. Make sure it's running on localhost:11434")
+        print("Cannot connect to Ollama. Make sure it's running on localhost:11434")
         print("   Start Ollama and try again.")
         return False
     except Exception as e:
-        print(f"❌ Error testing Ollama: {e}")
+        print(f"Error testing Ollama: {e}")
         return False
 
 def test_mistral_generation():
@@ -51,14 +51,14 @@ def test_mistral_generation():
         if response.status_code == 200:
             result = response.json()
             generated_text = result.get('response', '')
-            print(f"✅ Test generation successful: {generated_text.strip()}")
+            print(f"Test generation successful: {generated_text.strip()}")
             return True
         else:
-            print(f"❌ Generation failed with status: {response.status_code}")
+            print(f"Generation failed with status: {response.status_code}")
             return False
             
     except Exception as e:
-        print(f"❌ Error testing generation: {e}")
+        print(f"Error testing generation: {e}")
         return False
 
 if __name__ == "__main__":
