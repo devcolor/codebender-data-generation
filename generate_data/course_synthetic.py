@@ -25,8 +25,8 @@ DATABASES = [
     {"dbname": "Bishop_State_Community_College", "acronym": "AL"},
     {"dbname": "California_State_University_San_Bernardino", "acronym": "CSUSB"},
     {"dbname": "Kentucky_Community_and_Technical_College_System", "acronym": "KCTCS"},
-    {"dbname": "Thomas_More_University_KY", "acronym": "KY"},
-    {"dbname": "University_of_Akron_OH", "acronym": "OH"}
+    {"dbname": "Thomas_More_University", "acronym": "KY"},
+    {"dbname": "University_of_Akron", "acronym": "OH"}
 ]
 
 class OllamaSyntheticDataGenerator:

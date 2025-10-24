@@ -21,8 +21,8 @@ DATABASES = [
     {"dbname": "Bishop_State_Community_College", "shortname": "AL"},
     {"dbname": "California_State_University_San_Bernardino", "shortname": "CSUSB"},
     {"dbname": "Kentucky_Community_and_Technical_College_System", "shortname": "KCTCS"},
-    {"dbname": "Thomas_More_University_KY", "shortname": "KY"},
-    {"dbname": "University_of_Akron_OH", "shortname": "OH"}
+    {"dbname": "Thomas_More_University", "shortname": "KY"},
+    {"dbname": "University_of_Akron", "shortname": "OH"}
 ]
 
 def get_connection(dbname: str = None) -> mysql.connector.connection.MySQLConnection:
