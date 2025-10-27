@@ -51,7 +51,7 @@ def count_records_in_table(connection, table_name):
 def main():
     """Main function to count records in all databases."""
     
-    print("📊 Data Summary by School")
+    print("DATA SUMMARY BY SCHOOL")
     print("=" * 60)
     
     total_courses = 0
@@ -62,13 +62,13 @@ def main():
         db_name = db_info["dbname"]
         school_acronym = db_info["acronym"]
         
-        print(f"\n🏫 {school_acronym} - {db_name}")
+        print(f"\n{school_acronym} - {db_name}")
         print("-" * 50)
         
         # Connect to database
         connection = get_connection(db_name)
         if not connection:
-            print(f"❌ Could not connect to database: {db_name}")
+            print(f"[ERROR] Could not connect to database: {db_name}")
             continue
         
         try:
@@ -77,10 +77,10 @@ def main():
             cohort_count = count_records_in_table(connection, "cohort")
             financial_aid_count = count_records_in_table(connection, "financial_aid")
             
-            print(f"  📚 Course Records:      {course_count:,}")
-            print(f"  👥 Cohort Records:      {cohort_count:,}")
-            print(f"  💰 Financial Aid Records: {financial_aid_count:,}")
-            print(f"  📊 Total Records:       {course_count + cohort_count + financial_aid_count:,}")
+            print(f"  Course Records:          {course_count:,}")
+            print(f"  Cohort Records:          {cohort_count:,}")
+            print(f"  Financial Aid Records:   {financial_aid_count:,}")
+            print(f"  Total Records:           {course_count + cohort_count + financial_aid_count:,}")
             
             # Add to totals
             total_courses += course_count
@@ -92,17 +92,17 @@ def main():
     
     # Print grand totals
     print("\n" + "=" * 60)
-    print("🎯 GRAND TOTALS ACROSS ALL SCHOOLS")
+    print("GRAND TOTALS ACROSS ALL SCHOOLS")
     print("=" * 60)
-    print(f"📚 Total Course Records:      {total_courses:,}")
-    print(f"👥 Total Cohort Records:      {total_cohorts:,}")
-    print(f"💰 Total Financial Aid Records: {total_financial_aid:,}")
-    print(f"📊 GRAND TOTAL RECORDS:       {total_courses + total_cohorts + total_financial_aid:,}")
+    print(f"Total Course Records:        {total_courses:,}")
+    print(f"Total Cohort Records:        {total_cohorts:,}")
+    print(f"Total Financial Aid Records: {total_financial_aid:,}")
+    print(f"GRAND TOTAL RECORDS:         {total_courses + total_cohorts + total_financial_aid:,}")
     
-    print(f"\n📈 Average per school:")
-    print(f"  📚 Courses: {total_courses // 5:,} records per school")
-    print(f"  👥 Cohorts: {total_cohorts // 5:,} records per school")
-    print(f"  💰 Financial Aid: {total_financial_aid // 5:,} records per school")
+    print(f"\nAverage per school:")
+    print(f"  Courses:       {total_courses // 5:,} records per school")
+    print(f"  Cohorts:       {total_cohorts // 5:,} records per school")
+    print(f"  Financial Aid: {total_financial_aid // 5:,} records per school")
 
 if __name__ == "__main__":
     main()

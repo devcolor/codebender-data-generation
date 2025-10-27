@@ -141,13 +141,15 @@ python generate_db_summary.py
 
 ## Data Summary
 
-**Per Database:**
-- Course Records: 200
-- Cohort Records: 50
-- Financial Aid Records: 100
-- Total per school: 350 records
+**Current Population (Synthetic Data from seed_data01):**
+- Total Cohorts: 21 (3-5 per school)
+- Total Students: 21,153 (500-1,500 per cohort)
+- Total Course Enrollments: 105,726 (4-6 per student)
+- Total Financial Aid Records: 21,153 (1 per student)
 
-**Grand Total: 1,750 records across all databases**
+**Grand Total: 126,900 records across all databases**
+
+All records are marked with `dataset_type = 'S'` (Synthetic). Future real data will be marked with 'R'.
 
 ## Table Structures
 
@@ -158,6 +160,7 @@ python generate_db_summary.py
 - `credits` (INT)
 - `description` (TEXT)
 - `school` (VARCHAR(10)) - School acronym
+- `dataset_type` (VARCHAR(1)) - 'S' for Synthetic, 'R' for Real
 - `created_at` (TIMESTAMP)
 
 ### Cohort Table
@@ -166,6 +169,7 @@ python generate_db_summary.py
 - `start_date` (DATE)
 - `end_date` (DATE)
 - `school` (VARCHAR(10)) - School acronym
+- `dataset_type` (VARCHAR(1)) - 'S' for Synthetic, 'R' for Real
 - `created_at` (TIMESTAMP)
 
 ### Financial Aid Table
@@ -176,6 +180,7 @@ python generate_db_summary.py
 - `semester` (VARCHAR(20))
 - `academic_year` (VARCHAR(20))
 - `school` (VARCHAR(10)) - School acronym
+- `dataset_type` (VARCHAR(1)) - 'S' for Synthetic, 'R' for Real
 - `created_at` (TIMESTAMP)
 
 ## Join-Ready Structure
