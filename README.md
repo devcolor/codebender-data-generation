@@ -88,54 +88,53 @@ This creates 5 databases with 3 tables each:
 python test_db_connection.py
 ```
 
-## Data Generation Scripts (in generate_data/ folder)
+## Data Generation (School-Based Structure)
 
-### `test_ollama.py`
-- Tests if Ollama is running and accessible
-- Checks if Mistral model is available
-- Performs a test generation to verify functionality
+The data generation scripts are organized by school in the `generate_data/schools/` directory:
 
-### `course_synthetic.py`
-- Generates synthetic course data using Ollama Mistral LLM
-- Reads seed data from `data/course_analysis_ready_file_template_Identified_01_27_25.xlsx`
-- Removes rows 12+ from seed data (keeps first 11 rows as clean seed data)
-- Generates 200 records per database
-- Adds school acronym to each record
-- Has fallback generation if Ollama is not available
-
-### `cohort_synthetic.py`
-- Generates synthetic cohort data
-- Creates cohort names with semester/year/program combinations
-- Generates appropriate start/end dates
-- Adds 50 records per database
-
-### `financial_aid_synthetic.py`
-- Generates synthetic financial aid data
-- Creates realistic aid types (grants, loans, scholarships, work-study)
-- Generates appropriate amounts based on aid type
-- Adds 100 records per database
-
-## Usage
-
-### 1. Test Ollama connection (optional):
-```bash
-cd generate_data
-python test_ollama.py
+```
+generate_data/schools/
+├── shared/config.py              # Shared configuration and utilities
+├── AL/                           # Bishop State Community College
+│   ├── cohort.py
+│   ├── course.py
+│   ├── financial_aid.py
+│   └── generate_all.py
+├── CSUSB/                        # California State University San Bernardino
+├── KCTCS/                        # Kentucky Community and Technical College System
+├── KY/                           # Thomas More University
+├── OH/                           # University of Akron
+└── generate_all_schools.py       # Master script for all schools
 ```
 
-### 2. Generate synthetic data:
+### Generate Data for All Schools
 ```bash
-python course_synthetic.py
-python cohort_synthetic.py
-python financial_aid_synthetic.py
+cd generate_data/schools
+python generate_all_schools.py
+```
+This generates all data types for all 5 schools (1,750 total records).
+
+### Generate Data for a Specific School
+```bash
+cd generate_data/schools/AL
+python generate_all.py
+```
+This generates all data types for one school (350 records).
+
+### Generate Specific Data Type for a School
+```bash
+cd generate_data/schools/AL
+python cohort.py           # 50 cohort records
+python course.py           # 200 course records
+python financial_aid.py    # 100 financial aid records
 ```
 
-### 3. Count records (optional):
+### Count Records
 ```bash
 python count_records.py
 ```
 
-### 4. Generate Excel summary (optional):
+### Generate Excel Summary
 ```bash
 python generate_db_summary.py
 ```
@@ -197,18 +196,24 @@ If Ollama is not available or fails, scripts automatically use rule-based synthe
 ## Files Structure
 
 ```
-devcolor/
+devcolor-data-gen/
 ├── .env                          # Database configuration
 ├── requirements.txt              # Python dependencies
 ├── db_setup.py                  # Creates databases and tables
 ├── test_db_connection.py        # Tests database connection
 ├── count_records.py             # Counts records in all tables
+├── generate_db_summary.py       # Generates Excel summary of databases
 ├── rename_databases.py          # Utility to rename databases
 ├── data/                        # Seed data files
 │   └── course_analysis_ready_file_template_Identified_01_27_25.xlsx
 └── generate_data/               # Synthetic data generation scripts
-    ├── test_ollama.py
-    ├── course_synthetic.py
-    ├── cohort_synthetic.py
-    └── financial_aid_synthetic.py
+    ├── schools/                 # School-based generation scripts
+    │   ├── shared/config.py     # Shared configuration
+    │   ├── AL/                  # Bishop State Community College
+    │   ├── CSUSB/               # California State University San Bernardino
+    │   ├── KCTCS/               # Kentucky Community and Technical College System
+    │   ├── KY/                  # Thomas More University
+    │   ├── OH/                  # University of Akron
+    │   └── generate_all_schools.py
+    └── archive/                 # Old data-type-based scripts (for reference)
 ```
