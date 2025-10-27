@@ -44,8 +44,9 @@ data/cohort_analysis_ready_file_template_Identified_01-27-25.xlsx
 data/course_analysis_ready_file_template_Identified_01_27_25.xlsx
 data/financialaid_analysis_ready_file_template.xlsx
 database_summary_20251022.xlsx
-reset_and_populate_databases.py
-reset_and_populate_realistic.py
-reset_and_populate_student_records.py
+
+
+
 .gitignore
-verify_population.py
+
+
