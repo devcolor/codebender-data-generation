@@ -1,0 +1,113 @@
+# recommend_student_readiness.py
+import os, json, statistics
+import mysql.connector
+from shared.config import get_db_connection, SCHOOLS
+import requests
+
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
+MISTRAL_URL = "https://api.mistral.ai/v1/chat/completions"
+MODEL = "mistral-small-latest"  # or mistral-large-latest
+
+GRADE_POINTS = {"A":4.0,"A-":3.7,"B+":3.3,"B":3.0,"B-":2.7,"C+":2.3,"C":2.0,"C-":1.7,"D":1.0,"F":0.0}
+
+def fetch_snapshot(db="Kentucky_Community_and_Technical_College_System", student_guid=None):
+    conn = get_db_connection(db)
+    cur = conn.cursor(dictionary=True)
+
+    cur.execute("""
+        SELECT Institution_ID, Cohort, Cohort_Term, GPA_Group_Year_1, 
+               Pell_Status_First_Year, Enrollment_Type, Student_Age, Race, Ethnicity, Gender
+        FROM cohort
+        WHERE Student_GUID = %s
+        ORDER BY created_at DESC LIMIT 1
+    """, (student_guid,))
+    cohort = cur.fetchone()
+
+    cur.execute("""
+        SELECT Academic_Year, Academic_Term, Course_Prefix, Grade,
+               Number_of_Credits_Attempted as cr_att, Number_of_Credits_Earned as cr_earn,
+               Delivery_Method, Course_Type
+        FROM course
+        WHERE Student_GUID = %s
+    """, (student_guid,))
+    courses = cur.fetchall()
+
+    cur.execute("""
+        SELECT Unmet_Need, Net_Price, Dependency_Status, Housing_Status
+        FROM financial_aid
+        WHERE Institution_ID BETWEEN 86753100 AND 86753115
+          AND Cohort = %s AND Cohort_Term = %s
+        LIMIT 1
+    """, (cohort["Cohort"], cohort["Cohort_Term"]))
+    fin = cur.fetchone()
+
+    cur.close(); conn.close()
+    return cohort, courses, fin
+
+def summarize_courses(courses):
+    att = sum(c["cr_att"] or 0 for c in courses)
+    earn = sum(c["cr_earn"] or 0 for c in courses)
+    grades = [c["Grade"] for c in courses if c["Grade"]]
+    gp = [GRADE_POINTS[g] for g in grades if g in GRADE_POINTS]
+    gpa_proxy = round(sum(gp)/len(gp), 2) if gp else None
+    dfw = sum(1 for g in grades if g in ["D","F","W"])
+    d_total = len(grades) or 1
+    dfw_rate = round(dfw/d_total*100, 1)
+    delivery = {}
+    for c in courses:
+        delivery[c["Delivery_Method"]] = delivery.get(c["Delivery_Method"], 0) + 1
+    return {
+        "credits_attempted": att,
+        "credits_earned": earn,
+        "gpa_proxy": gpa_proxy,
+        "dfw_rate_pct": dfw_rate,
+        "delivery_mix": delivery,
+        "avg_courses_per_term": round(len(courses)/max(1, len({(c["Academic_Year"], c["Academic_Term"]) for c in courses})), 2)
+    }
+
+def call_mistral(system_msg, user_msg):
+    headers = {"Authorization": f"Bearer {MISTRAL_API_KEY}", "Content-Type": "application/json"}
+    payload = {
+        "model": MODEL,
+        "messages": [
+            {"role": "system", "content": system_msg},
+            {"role": "user", "content": user_msg}
+        ],
+        "temperature": 0.3,
+        "response_format": {"type": "json_object"}
+    }
+    resp = requests.post(MISTRAL_URL, headers=headers, json=payload, timeout=60)
+    resp.raise_for_status()
+    return json.loads(resp.json()["choices"][0]["message"]["content"])
+
+def recommend(student_guid):
+    cohort, courses, fin = fetch_snapshot(student_guid=student_guid)
+    course_summary = summarize_courses(courses)
+
+    system = "You are an academic success coach. Output strict JSON per schema."
+    user = f"""Student snapshot:
+- Cohort: {cohort['Cohort']} {cohort['Cohort_Term']}, Institution: {cohort['Institution_ID']}
+- GPA_Group_Year_1: {cohort['GPA_Group_Year_1']}, Pell: {cohort['Pell_Status_First_Year']}, Enrollment_Type: {cohort['Enrollment_Type']}
+- Courses: {course_summary['credits_attempted']} attempted, {course_summary['credits_earned']} earned, avg {course_summary['avg_courses_per_term']} courses/term
+- Grades proxy GPA: {course_summary['gpa_proxy']}, D/F/W rate: {course_summary['dfw_rate_pct']}%
+- Delivery mix: {course_summary['delivery_mix']}
+- Financial (if any): {fin}
+
+Task:
+- Identify top risk and strength factors.
+- Provide 5 prioritized recommendations.
+- Suggest next-term focus (courses/study_habits/support).
+
+Schema:
+{{"readiness_level": "...", "key_factors": [], "recommendations": [], "next_term_focus": {{"courses": [], "study_habits": [], "support_services": []}}, "confidence": 0.0}}
+"""
+    return call_mistral(system, user)
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--student-guid", required=True)
+    parser.add_argument("--db", default="Kentucky_Community_and_Technical_College_System")
+    args = parser.parse_args()
+    out = recommend(args.student_guid)
+    print(json.dumps(out, indent=2))

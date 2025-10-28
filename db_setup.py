@@ -110,6 +110,35 @@ def create_tables(conn: mysql.connector.connection.MySQLConnection, shortname: s
             school VARCHAR(10),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
+        """,
+        f"""
+        CREATE TABLE IF NOT EXISTS llm_recommendations (
+            id BIGINT AUTO_INCREMENT PRIMARY KEY,
+            Student_GUID VARCHAR(58) NOT NULL,
+            Institution_ID BIGINT,
+            Cohort VARCHAR(57),
+            Cohort_Term VARCHAR(56),
+            Academic_Year VARCHAR(57),
+            school VARCHAR(10),
+            recommendation_type VARCHAR(50) NOT NULL,
+            readiness_score DECIMAL(5,4),
+            readiness_level VARCHAR(20),
+            rationale TEXT,
+            risk_factors JSON,
+            suggested_actions JSON,
+            inputs_snapshot JSON,
+            course_summaries JSON,
+            prompt_version VARCHAR(50) NOT NULL,
+            model_name VARCHAR(100) NOT NULL,
+            model_version VARCHAR(100),
+            input_hash CHAR(64) NOT NULL,
+            status VARCHAR(20) NOT NULL DEFAULT 'ok',
+            error_message TEXT,
+            generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_student_rec_time (Student_GUID, recommendation_type, generated_at),
+            INDEX idx_school (school),
+            UNIQUE KEY unique_recommendation (Student_GUID, recommendation_type, prompt_version, input_hash)
+        )
         """
     ]
     
