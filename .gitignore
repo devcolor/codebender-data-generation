@@ -46,3 +46,11 @@ data/financialaid_analysis_ready_file_template.xlsx
 database_summary_20251022.xlsx
 llm/check_progress.py
 llm/llm_student_readiness.py
+test_analysis/get_kctcs_complete_schema.py
+test_analysis/export_kctcs_schema.py
+.gitignore
+test_analysis/get_kctcs_schema_fixed.py
+test_analysis/get_kctcs_schema.py
+test_analysis/verify_kctcs_prediction_tables.py
+create_prediction_tables.py
+create_kctcs_prediction_tables.py
