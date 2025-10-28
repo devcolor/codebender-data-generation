@@ -55,8 +55,10 @@ def create_database(conn: mysql.connector.connection.MySQLConnection, dbname: st
     finally:
         cursor.close()
 
-def create_tables(conn: mysql.connector.connection.MySQLConnection) -> None:
+def create_tables(conn: mysql.connector.connection.MySQLConnection, shortname: str) -> None:
     """Create tables in the specified database."""
+    ar_table_name = f"ar_{shortname.lower()}"
+    
     commands = [
         """
         CREATE TABLE IF NOT EXISTS cohort (
@@ -87,6 +89,27 @@ def create_tables(conn: mysql.connector.connection.MySQLConnection) -> None:
             academic_year VARCHAR(20),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
+        """,
+        f"""
+        CREATE TABLE IF NOT EXISTS {ar_table_name} (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            student_id VARCHAR(50) NOT NULL,
+            years_to_bachelors_cohort VARCHAR(50),
+            years_to_assoc_cert_cohort VARCHAR(50),
+            years_to_bachelor_other VARCHAR(50),
+            years_to_assoc_cert_other VARCHAR(50),
+            naspa_first_gen VARCHAR(50),
+            first_year_bachelors_cohort VARCHAR(50),
+            first_year_assoc_cert_cohort VARCHAR(50),
+            first_year_bachelor_other VARCHAR(50),
+            first_year_assoc_cert_other VARCHAR(50),
+            recent_assoc_cert_other_state VARCHAR(50),
+            recent_assoc_cert_other_carnegie VARCHAR(50),
+            first_assoc_cert_other_carnegie VARCHAR(50),
+            recent_assoc_cert_other_locale VARCHAR(50),
+            school VARCHAR(10),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
         """
     ]
     
@@ -113,6 +136,7 @@ def setup_databases():
         
         for db in DATABASES:
             dbname = db["dbname"]
+            shortname = db["shortname"]
             print(f"\nSetting up database: {dbname}")
             
             # Create database
@@ -125,7 +149,7 @@ def setup_databases():
             db_conn = get_connection(dbname)
             
             # Create tables
-            create_tables(db_conn)
+            create_tables(db_conn, shortname)
             
             # Close connection to this database
             db_conn.close()
