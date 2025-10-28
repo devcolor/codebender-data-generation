@@ -143,9 +143,9 @@ def insert_analysis_ready_data(connection, data: List[Dict]):
         cursor.close()
 
 def main():
-    """Main function to generate analysis_ready_all data for AL."""
+    """Main function to generate AR data for AL."""
     print(f"\n{'='*60}")
-    print(f"Analysis Ready All Data Generation - {SCHOOL_INFO['name']}")
+    print(f"AR Data Generation ({AR_TABLE_NAME}) - {SCHOOL_INFO['name']}")
     print(f"{'='*60}\n")
     
     # Connect to database
@@ -173,7 +173,7 @@ def main():
         # Insert data
         insert_analysis_ready_data(connection, synthetic_data)
         
-        print(f"\n✓ Successfully populated {SCHOOL_INFO['acronym']} analysis_ready_all table")
+        print(f"\n✓ Successfully populated {SCHOOL_INFO['acronym']} {AR_TABLE_NAME} table")
         print(f"  Total records: {len(synthetic_data)}")
         
     finally:
