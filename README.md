@@ -116,6 +116,85 @@ DB_PORT=3306              # Default MariaDB/MySQL port
 
 ---
 
+## Development Environment Options
+
+### Cloud Database vs Local Database
+
+This project supports both local and cloud-based database development. Choose the option that best fits your development needs:
+
+#### **Local Database Development (Recommended for Development)**
+
+**Advantages:**
+- **Fast Development Cycle**: No network latency for database operations
+- **Offline Development**: Work without internet connectivity
+- **Full Control**: Complete control over database configuration and data
+- **Cost-Effective**: No cloud hosting costs during development
+- **Privacy**: All data stays on your local machine
+
+**Best For:**
+- Initial development and testing
+- Learning the codebase
+- Experimenting with data generation
+- Working with synthetic data only
+
+**Setup:**
+- Install MariaDB locally (see Prerequisites section)
+- Use `DB_HOST=localhost` in your `.env` file
+- All database operations run on your local machine
+
+#### **Cloud Database Development (Recommended for Production/Team)**
+
+**Advantages:**
+- **Team Collaboration**: Shared database access for multiple developers
+- **Production-Like Environment**: Test against cloud infrastructure
+- **Scalability**: Handle larger datasets and concurrent users
+- **Backup & Recovery**: Automated backups and disaster recovery
+- **Remote Access**: Access from anywhere with internet
+
+**Best For:**
+- Team development projects
+- Production deployments
+- Working with large datasets
+- Multi-developer collaboration
+- Integration testing
+
+**Setup:**
+- Use a cloud MariaDB service (AWS RDS MariaDB, Google Cloud SQL MariaDB, etc.)
+- Configure remote connection details in `.env`:
+  ```
+  DB_HOST=your-cloud-mariadb-host.com
+  DB_USER=your_username
+  DB_PASSWORD=your_password
+  DB_PORT=3306
+  ```
+- Ensure proper security groups/firewall rules for database access
+
+#### **Choosing Your Database Setup**
+
+Choose **ONE** of the following options for your development environment:
+
+**Option 1: Local MariaDB Server**
+```bash
+# In your .env file
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_password
+DB_PORT=3306
+```
+
+**Option 2: Cloud MariaDB Server**
+```bash
+# In your .env file
+DB_HOST=your-cloud-mariadb-host.com
+DB_USER=your_username
+DB_PASSWORD=your_password
+DB_PORT=3306
+```
+
+All scripts and operations work identically with either setup.
+
+---
+
 ## Database Operations
 
 ### Database Structure
@@ -159,6 +238,14 @@ python dboperations/generate_db_summary.py
 **Create prediction tables:**
 ```bash
 python dboperations/create_prediction_tables.py
+```
+
+**View database schemas:**
+```bash
+python dboperations/view_schema.py                    # View all databases
+python dboperations/view_schema.py --database AL     # View specific database
+python dboperations/view_schema.py --table cohort    # View specific table
+python dboperations/view_schema.py --overview        # Overview only
 ```
 
 See `dboperations/README.md` for complete documentation.
@@ -276,44 +363,34 @@ All records are marked with `dataset_type = 'S'` (Synthetic). Future real data w
 
 ---
 
-## Table Structures
+## Database Schema
 
-### Course Table
-- `id` (AUTO_INCREMENT PRIMARY KEY)
-- `code` (VARCHAR(50))
-- `title` (VARCHAR(255))
-- `credits` (INT)
-- `description` (TEXT)
-- `school` (VARCHAR(10)) - School acronym
-- `dataset_type` (VARCHAR(1)) - 'S' for Synthetic, 'R' for Real
-- `created_at` (TIMESTAMP)
-
-### Cohort Table
-- `id` (AUTO_INCREMENT PRIMARY KEY)
-- `name` (VARCHAR(255))
-- `start_date` (DATE)
-- `end_date` (DATE)
-- `school` (VARCHAR(10)) - School acronym
-- `dataset_type` (VARCHAR(1)) - 'S' for Synthetic, 'R' for Real
-- `created_at` (TIMESTAMP)
-
-### Financial Aid Table
-- `id` (AUTO_INCREMENT PRIMARY KEY)
-- `student_id` (VARCHAR(50))
-- `aid_type` (VARCHAR(100))
-- `amount` (DECIMAL(10,2))
-- `semester` (VARCHAR(20))
-- `academic_year` (VARCHAR(20))
-- `school` (VARCHAR(10)) - School acronym
-- `dataset_type` (VARCHAR(1)) - 'S' for Synthetic, 'R' for Real
-- `created_at` (TIMESTAMP)
+For detailed table structures, column definitions, and relationships, see **[DATABASE_SCHEMA.md](DATABASE_SCHEMA.md)**.
 
 ### Table Relationships
 
-All tables include a `school` column for cross-database joins:
-- Each table has an auto-incrementing `id` field (PRIMARY KEY)
-- Tables can be joined using the `school` column
-- Example: `SELECT * FROM course c JOIN cohort co ON c.school = co.school WHERE c.school = 'AL'`
+**Student-Centric Connections:**
+- Tables are linked through `student_id` or `Student_GUID` fields
+- `financial_aid.student_id` connects student financial records
+- `llm_recommendations.Student_GUID` links AI recommendations to students
+
+**Institution-Centric Connections:**
+- All tables include a `school` column (AL, CSUSB, KCTCS, KY, OH)
+- `llm_recommendations.Institution_ID` provides institutional linking
+- Cross-database joins possible using `school` column
+
+**Example Joins:**
+```sql
+-- Get all data for a specific school
+SELECT * FROM course c 
+JOIN cohort co ON c.school = co.school 
+WHERE c.school = 'AL';
+
+-- Get student financial aid and recommendations
+SELECT fa.*, lr.* FROM financial_aid fa
+JOIN llm_recommendations lr ON fa.student_id = lr.Student_GUID
+WHERE fa.school = 'AL';
+```
 
 ---
 
@@ -323,6 +400,7 @@ All tables include a `school` column for cross-database joins:
 devcolor-data-gen/
 ├── .env                          # Database configuration
 ├── requirements.txt              # Python dependencies
+├── DATABASE_SCHEMA.md            # Complete database schema documentation
 ├── data/                         # Seed data files
 │   └── course_analysis_ready_file_template_Identified_01_27_25.xlsx
 ├── dboperations/                 # Database operations and utilities
@@ -330,6 +408,7 @@ devcolor-data-gen/
 │   ├── db_setup.py               # Creates databases and tables
 │   ├── count_records.py          # Counts records in all tables
 │   ├── generate_db_summary.py    # Generates Excel summary of databases
+│   ├── view_schema.py            # View database schemas and table structures
 │   ├── create_complete_seed_structure.py  # Seed data structure creation
 │   ├── create_prediction_tables.py        # Create prediction tables
 │   ├── create_kctcs_prediction_tables.py  # KCTCS-specific prediction tables
