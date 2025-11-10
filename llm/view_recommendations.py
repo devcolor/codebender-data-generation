@@ -10,7 +10,7 @@ import json
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import mysql.connector
-from db_setup import DB_CONFIG
+from dboperations.db_setup import DB_CONFIG
 
 
 def view_recommendations(database_name: str, limit: int = 10):

@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import mysql.connector
 from mysql.connector import Error
-from db_setup import DB_CONFIG, DATABASES
+from dboperations.db_setup import DB_CONFIG, DATABASES
 
 
 def add_llm_table(database_name: str):
