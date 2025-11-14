@@ -398,9 +398,11 @@ WHERE fa.school = 'AL';
 
 ```
 devcolor-data-gen/
-├── .env                          # Database configuration
+├── .env                          # Local database configuration
+├── .env.example                  # Example environment configuration
 ├── requirements.txt              # Python dependencies
 ├── DATABASE_SCHEMA.md            # Complete database schema documentation
+├── database_summary_*.xlsx       # Generated database summary reports
 ├── data/                         # Seed data files
 │   └── course_analysis_ready_file_template_Identified_01_27_25.xlsx
 ├── dboperations/                 # Database operations and utilities
@@ -422,14 +424,16 @@ devcolor-data-gen/
 │   ├── view_recommendations.py   # View LLM recommendations
 │   ├── check_progress.py         # Check recommendation progress
 │   └── alter_add_school_column.py  # Add school column to tables
-└── generate_data/                # Synthetic data generation scripts
-    ├── schools/                  # School-based generation scripts
-    │   ├── shared/config.py      # Shared configuration
-    │   ├── AL/                   # Bishop State Community College
-    │   ├── CSUSB/                # California State University San Bernardino
-    │   ├── KCTCS/                # Kentucky Community and Technical College System
-    │   ├── KY/                   # Thomas More University
-    │   ├── OH/                   # University of Akron
-    │   └── generate_all_schools.py
-    └── archive/                  # Old data-type-based scripts (for reference)
+├── generate_data/                # Synthetic data generation scripts
+│   ├── schools/                  # School-based generation scripts
+│   │   ├── shared/config.py      # Shared configuration
+│   │   ├── AL/                   # Bishop State Community College
+│   │   ├── CSUSB/                # California State University San Bernardino
+│   │   ├── KCTCS/                # Kentucky Community and Technical College System
+│   │   ├── KY/                   # Thomas More University
+│   │   ├── OH/                   # University of Akron
+│   │   └── generate_all_schools.py
+│   └── archive/                  # Old data-type-based scripts (for reference)
+├── venv/                         # Optional local Python virtualenv (ignored in git)
+└── .venv/                        # Optional local Python virtualenv (ignored in git)
 ```
