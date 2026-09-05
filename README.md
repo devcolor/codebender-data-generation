@@ -365,7 +365,9 @@ All records are marked with `dataset_type = 'S'` (Synthetic). Future real data w
 
 ## Database Schema
 
-For detailed table structures, column definitions, and relationships, see **[DATABASE_SCHEMA.md](DATABASE_SCHEMA.md)**.
+For detailed table structures, column definitions, and relationships, see the [`docs/`](docs) folder:
+- [`docs/PDP_SCHEMA.md`](docs/PDP_SCHEMA.md) — the standardized Cohort/Course/Financial Aid file structure shared by all schools
+- [`docs/KCTCS_SCHEMA.md`](docs/KCTCS_SCHEMA.md) — an example of how one school (KCTCS) extends that base structure with analysis-ready and ML prediction fields
 
 ### Table Relationships
 
@@ -401,8 +403,10 @@ devcolor-data-gen/
 ├── .env                          # Local database configuration
 ├── .env.example                  # Example environment configuration
 ├── requirements.txt              # Python dependencies
-├── DATABASE_SCHEMA.md            # Complete database schema documentation
 ├── database_summary_*.xlsx       # Generated database summary reports
+├── docs/                         # Schema documentation
+│   ├── PDP_SCHEMA.md             # Standardized Cohort/Course/Financial Aid schema
+│   └── KCTCS_SCHEMA.md           # KCTCS analysis-ready and ML prediction schema
 ├── data/                         # Seed data files
 │   └── course_analysis_ready_file_template_Identified_01_27_25.xlsx
 ├── dboperations/                 # Database operations and utilities
